@@ -1,0 +1,19 @@
+{
+  "name": "sensor-watch-modem",
+  "version": "0.0.1",
+  "description": "Audio modem to receive data transmission out of the Sensor Watch",
+  "license": "MIT",
+  "author": {
+    "name": "Gábor L Ugray",
+    "email": "gabor.reads.this@gmail.com"
+  },
+  "devDependencies": {
+    "esbuild": "^0.16.13",
+    "esbuild-plugin-less": "^1.1.11",
+    "livereload": "^0.9.3",
+    "md5": "^2.3.0",
+    "static-server": "^2.2.1"
+  },
+  "dependencies": {
+  }
+}

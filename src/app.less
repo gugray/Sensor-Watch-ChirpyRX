@@ -1,0 +1,20 @@
+@fntBaseSize: 18px;
+@fntBaseFamily: "Segoe UI", "San Francisco", "Helvetica Neue", sans-serif;
+@textColor: #505050;
+@bgColor: white;
+
+*, *:before, *:after { box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  margin: 0; display: flex; justify-content: center;
+  font-family: @fntBaseFamily;
+  font-size: @fntBaseSize; color: @textColor;
+  background-color: @bgColor;
+}
+
+section { min-width: 600px; }
+
+#spectogram {
+  border: 1px solid @textColor; padding: 5px;
+  font-family: monospace; white-space: pre-wrap; font-size: 10px;
+}
