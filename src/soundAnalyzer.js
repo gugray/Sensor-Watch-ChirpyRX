@@ -1,11 +1,11 @@
-import {notes} from "./notes.js";
+import {notes} from "./freqConsts";
 
 const scale = ["B3", "D4", "F4", "A4", "C5", "E5", "G5", "B5", "D6", "F6", "A6", "C7", "E7", "G7", "B7", "D8", "F8", "A8"];
 const tickMsec = 5;
 
 class SoundAnalyzer {
 
-  constructor(maxDecibels = -35, minDecibels = -80, filterQ = 1) {
+  constructor(maxDecibels = -35, minDecibels = -80, filterQ = 100) {
 
     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     this.mic = null;

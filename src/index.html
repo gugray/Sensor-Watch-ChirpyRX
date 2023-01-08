@@ -7,6 +7,8 @@
   <title>Sensor Watch Modem</title>
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <link rel="stylesheet" href="./app.css" id="app-css">
+  <script src="dsp.js"></script>
+  <script src="WavAudioEncoder.js"></script>
   <script defer src="./app.js" id="app-js"></script>
   <!--LiveReload-->
   <script>
@@ -18,11 +20,26 @@
 <body>
   <main>
     <section>
-      <h2>Analyze microphone</h2>
+      <h2>Record mic</h2>
       <p>
-        <button id="btnAnalysis">Turn on</button>
-        <span id="sampleCount"></span>
-        <a id="downloadSample" style="display: none;">download</a>
+        <button id="btnRecord">Record</button>
+      </p>
+    </section>
+    <section>
+      <h2>Audio file</h2>
+      <p>
+        <button id="btnLoad">Load file</button>
+        <button id="btnPlay" style="display: none;">Play</button>
+        <span id="playState"></span>
+      </p>
+    </section>
+    <section>
+      <h2>Output</h2>
+      <p>
+        <a id="downloadSample" style="display: none;">download sample</a>
+      </p>
+      <p>
+        <canvas id="sgCanvas"></canvas>
       </p>
     </section>
   </main>

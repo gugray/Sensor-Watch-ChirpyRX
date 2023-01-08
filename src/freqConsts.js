@@ -45,4 +45,27 @@ const notes = {
   B8: 7902.13,
 };
 
-export {notes}
+// 16 evenly spaced symbol frequencies plus 2 musical sync tones
+// Corresponds to periods hard-wired in watch
+const symFreqs = [
+  1945,
+  2174,
+  2403,
+  2632,
+  2861,
+  3090,
+  3319,
+  3548,
+  3777,
+  4006,
+  4235,
+  4464,
+  4693,
+  4922,
+  5151,
+  5380,
+  1716,
+  5609,
+];
+
+export {notes, symFreqs}
