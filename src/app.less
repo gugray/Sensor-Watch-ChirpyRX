@@ -4,7 +4,7 @@
 @bgColor: white;
 
 *, *:before, *:after { box-sizing: border-box; }
-html, body { height: 100%; overflow: hidden; }
+html, body { height: 100%; overflow-y: scroll; }
 body {
   margin: 0; display: flex; justify-content: center;
   font-family: @fntBaseFamily;
@@ -14,9 +14,15 @@ body {
 
 section { min-width: 600px; }
 
+#decoded {
+  font-family: monospace; white-space: pre-wrap; font-size: 15px;
+  max-width: 1024px; padding: 8px;
+  border-top: 1px solid grey; border-bottom: 1px solid grey;
+}
 #spectogram {
   border: 1px solid @textColor; padding: 5px;
   font-family: monospace; white-space: pre-wrap; font-size: 10px;
 }
 
+#canvasHolder { width: 1024px; overflow-x: scroll; }
 #sgCanvas { background-color: black; width: 1024px; height: 512px;}

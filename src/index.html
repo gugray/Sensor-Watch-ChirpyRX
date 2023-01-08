@@ -23,22 +23,27 @@
       <h2>Record mic</h2>
       <p>
         <button id="btnRecord">Record</button>
+        <a id="downloadRecording" style="display: none;">save recording</a>
       </p>
     </section>
     <section>
       <h2>Audio file</h2>
+      <p><b>File:</b> <span id="audioFileName"></span></p>
       <p>
         <button id="btnLoad">Load file</button>
         <button id="btnPlay" style="display: none;">Play</button>
-        <span id="playState"></span>
+        <button id="btnAnalyze" style="display: none;">Analyze</button>
       </p>
     </section>
     <section>
       <h2>Output</h2>
       <p>
-        <a id="downloadSample" style="display: none;">download sample</a>
+        <input type="checkbox" id="cbStencil" name="cbStencil" disabled>
+        <label for="cbStencil"> Show stencil</label><br>
+        <a id="downloadSample" style="display: none;">download spectrum data</a>
       </p>
-      <p>
+      <p id="decoded">&lt;Decoded message&gt;</p>
+      <p id="canvasHolder">
         <canvas id="sgCanvas"></canvas>
       </p>
     </section>

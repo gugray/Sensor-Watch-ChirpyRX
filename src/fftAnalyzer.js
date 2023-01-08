@@ -1,18 +1,19 @@
-const bufferSize = 1024;
-
 class FFTAnalyzer {
 
-  constructor(audioCtx, inputNode, sampleRate) {
+  constructor(sampleRate, fftSize) {
+    this.fftSize = fftSize;
+    this.sampleRate = sampleRate;
+    this.fft = new FFT(fftSize, sampleRate);
+    this.spectra = [];
+  }
+
+  connect(audioCtx, inputNode) {
     this.audioCtx = audioCtx;
     this.inputNode = inputNode;
-    this.sampleRate = sampleRate;
-    this.fft = new FFT(bufferSize, sampleRate);
-    this.procFun = (evt) => this.process(evt);
-    this.processor = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+    this.procFun = (evt) => this.processEvent(evt);
+    this.processor = audioCtx.createScriptProcessor(this.fftSize, 1, 1);
     this.processor.addEventListener("audioprocess", this.procFun);
     inputNode.connect(this.processor);
-
-    this.spectra = [];
   }
 
   disconnect() {
@@ -20,8 +21,12 @@ class FFTAnalyzer {
     this.inputNode.disconnect(this.proc);
   }
 
-  process(evt) {
-    this.fft.forward(evt.inputBuffer.getChannelData(0));
+  processEvent(evt) {
+    this.processData((evt.inputBuffer.getChannelData(0)));
+  }
+
+  processData(data) {
+    this.fft.forward(data);
     let s = new Float32Array(this.fft.spectrum.length);
     for (let i = 0; i < s.length; ++i) s[i] = this.fft.spectrum[i];
     this.spectra.push(s);
@@ -37,7 +42,7 @@ class FFTAnalyzer {
         sample += " ";
         sample += val.toFixed(4);
       }
-      msec += bufferSize / this.sampleRate * 1000;
+      msec += this.fftSize / this.sampleRate * 1000;
       samples.push(sample);
     }
     return samples;
