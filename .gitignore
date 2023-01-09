@@ -3,6 +3,6 @@ node_modules
 .idea
 yarn-error.log
 
-public/app.*
-public/index.html
-public/version.html
+src/webapp/public/app.*
+src/webapp/public/index.html
+src/webapp/public/version.html
