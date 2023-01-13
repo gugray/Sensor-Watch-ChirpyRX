@@ -1,13 +1,18 @@
 import {FFTAnalyzer} from "./fftAnalyzer.js";
-import {symFreqs} from "./freqConsts.js";
 import {ToneStencil, Decoder} from "./decoder.js"
 
-const audioFile = "data-w5-20.wav";
+const audioFile = "data-b7-21.wav";
 const gainVal = 10;
-const toneRate = 20;
+const toneRate = 64/3;
+const baseFreq = 2500;
+const freqStep = 250;
+const nFreqs = 9;
 const fftSize = 512;
 
 // 2400 => 199
+
+// 2200 -> 5600 => 3400 range
+// 2200 + n * 375
 
 let elmBtnRecord;
 let elmDownloadRec;
@@ -22,6 +27,7 @@ let audioCtx, gain, buffer, source, scriptNode, encoder;
 let isPlaying = false;
 let fftAnalyzer;
 let spectra;
+let dec, startMsec, tones;
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   elmBtnPlay.addEventListener("click", () => onPlay());
 
   elmStencil = document.getElementById("cbStencil");
+  elmStencil.checked = false;
   elmStencil.addEventListener("change", () => onStencilChanged());
   elmDecoded = document.getElementById("decoded");
   elmDownloadSamples = document.getElementById("downloadSample");
@@ -142,22 +149,27 @@ function retrieveFFTSamples() {
   const fftSamples = fftAnalyzer.getSamples();
   createSamplesDownload(fftSamples);
 
-  const dec = new Decoder(buffer.sampleRate, fftSize, toneRate);
-  const startMsec = dec.findStartMsec(spectra);
+  dec = new Decoder({
+    sampleRate: buffer.sampleRate,
+    fftSize,
+    toneRate,
+    baseFreq,
+    freqStep,
+    nFreqs});
+  startMsec = dec.findStartMsec(spectra);
   const recLen = Math.round(buffer.length / buffer.sampleRate * 1000);
   elmDecoded.innerText = "Start detected at " + startMsec + " (total length: " + recLen + ")\n";
 
-  const tones = [];
+  tones = [];
   let endDetected = false;
   if (startMsec != -1) {
-    for (let i = 3; ++i; true) {
+    for (let i = 0; true; ++i) {
       const msec = startMsec + dec.toneLenMsec * i;
       if (msec + 200 > recLen) break;
       const tone = dec.detecToneAt(spectra, msec);
       tones.push(tone);
-      if (tone == 17 && tones.length >= 2 && tones[tones.length-2] == 16) {
+      if (tone == dec.symFreqs.length - 1 && tones.length >= 2 && tones[tones.length-2] == 0) {
         endDetected = true;
-        break;
       }
     }
     if (!endDetected) {
@@ -202,7 +214,7 @@ function onAnalyze() {
   fftAnalyzer = new FFTAnalyzer(buffer.sampleRate, fftSize);
   const data = buffer.getChannelData(0);
   const frame = new Float32Array(fftSize);
-  for (ix = 0; ix + fftSize <= data.length; ix += fftSize) {
+  for (let ix = 0; ix + fftSize <= data.length; ix += fftSize) {
     for (let i = 0; i < fftSize; ++i)
       frame[i] = data[ix + i] * gainVal;
     fftAnalyzer.processData(frame);
@@ -228,10 +240,7 @@ function drawOutput() {
     for (let i = 0; i < s.length; ++i) {
       const y = h - i - 1;
       let val = Math.floor(s[i] * 2048);
-      imgData.data[(y * w + x) * 4] = val;
-      imgData.data[(y * w + x) * 4 + 1] = val * 0.25;
-      imgData.data[(y * w + x) * 4 + 2] = val * 0.25;
-      imgData.data[(y * w + x) * 4 + 3] = 255;
+      setPixel(imgData, x, y, val, val * 0.25, val * 0.25);
     }
   }
   ctx.putImageData(imgData, 0, 0);
@@ -241,41 +250,52 @@ function drawOutput() {
 function onStencilChanged() {
   if (!spectra) return;
   drawOutput();
-  if (elmStencil.checked) drawStencil();
+  if (elmStencil.checked) drawStencil(dec, tones, startMsec);
 }
 
-function drawStencil() {
-
-  const symIxs = [17, 16, 17, 16, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-  const freqs = [];
-  symIxs.forEach(ix => freqs.push(symFreqs[ix]));
-  const tss = [];
-  freqs.forEach(freq => tss.push(new ToneStencil(freq, buffer.sampleRate, fftSize)));
+function drawStencil(dec, tones, startMsec) {
 
   const w = spectra.length;
-  const h = 512;
+  const h = dec.fftSize / 2;
   const ctx = elmCanvas.getContext("2d");
   const imgData = ctx.getImageData(0, 0, w, h);
 
-  const ofsMsec = 4342;
-  const sampleLenMsec = fftSize / buffer.sampleRate * 1000;
-  for (let i = 0; i < tss.length; ++i) {
-    const ts = ofsMsec + (i + 0.5) * (1000 / toneRate);
-    const frameIx = Math.round(ts / sampleLenMsec);
-    drawBins(tss[i], frameIx);
+  for (let i = 0; i < tones.length; ++i) {
+
+    const x1 = Math.round((startMsec + dec.toneLenMsec * (i-0.5)) / dec.sampleLenMsec);
+    const x2 = Math.round((startMsec + dec.toneLenMsec * (i+0.5)) / dec.sampleLenMsec);
+
+    const toneIx = tones[i];
+
+    if (toneIx == -1) {
+      drawRect(x1, 0, x2 - x1, h);
+      continue;
+    }
+
+    let y1 = dec.stencils[toneIx].bins[0];
+    let y2 = dec.stencils[toneIx].bins[dec.stencils[toneIx].bins.length - 1];
+    let rh = Math.abs(y2 - y1) + 1;
+    let y = Math.min(y1, y2);
+    drawRect(x1, h - y - 1, x2 - x1, rh);
   }
   ctx.putImageData(imgData, 0, 0);
 
-  function drawBins(stencil, x) {
-    for (const binIx of stencil.bins) {
-      setPixel(x, h - binIx - 1, 32, 32, 255);
+  function drawRect(x, y, w, h) {
+    for (let i = x; i < x + w; ++i) {
+      setPixel(imgData, i, y, 128, 128, 255);
+      setPixel(imgData, i, y + h - 1, 128, 128, 255);
+    }
+    for (let i = y; i < y + h; ++i) {
+      setPixel(imgData, x, i, 128, 128, 255);
+      setPixel(imgData, x + w - 1, i, 128, 128, 255);
     }
   }
+}
 
-  function setPixel(x, y, r, g, b) {
-    imgData.data[(y * w + x) * 4] = r;
-    imgData.data[(y * w + x) * 4 + 1] = g;
-    imgData.data[(y * w + x) * 4 + 2] = b;
-    imgData.data[(y * w + x) * 4 + 3] = 255;
-  }
+function setPixel(imgd, x, y, r, g, b, a = 255) {
+  const w = imgd.width;
+  imgd.data[(y * w + x) * 4] = r;
+  imgd.data[(y * w + x) * 4 + 1] = g;
+  imgd.data[(y * w + x) * 4 + 2] = b;
+  imgd.data[(y * w + x) * 4 + 3] = a;
 }
