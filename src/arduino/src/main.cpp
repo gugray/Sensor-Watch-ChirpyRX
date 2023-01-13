@@ -1,10 +1,28 @@
 #include <Arduino.h>
 #include "shared.h"
 #include "blinkTestWorker.h"
+#include "scaleWorker.h"
+#include "data8Worker.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#include "lib/chirpy_tx.h"
+#ifdef __cplusplus
+}
+#endif
+
+
+// CRC-8 to add:
+// https://stackoverflow.com/a/15171925
+// This >>>>  https://stackoverflow.com/a/51731327
 
 // Edit this to use different worker in sketch
 // Ie try a different buzzin experiment
-#define WORKER BlinkTestWorker
+#define WORKER Data8Worker
+
+const uint16_t tonePeriods16[] = { 417, 385, 358, 334, 313, 295, 278, 264, 251, 239, 228, 218, 209, 201, 193, 186, 455, 179 };
 
 // Using 16-bit timer1 prescaled to 2 x 1Mhz to drive the buzzer.
 // -> Periods this way are the same as in watch.
@@ -62,6 +80,7 @@ ISR(TIMER2_OVF_vect)
   if (worker == NULL) return;
   // Call tick. Remove worker when they say they're finished.
   if (!worker->Tick()) worker = NULL;
+  else worker->Count();
 }
 
 void setupTimer1()
@@ -130,6 +149,7 @@ void loop()
 {
   // Dummy
   delay(100);
+  crc8("fds", 3);
 }
 
 void buzzerOff()

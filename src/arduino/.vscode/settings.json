@@ -1,5 +1,20 @@
 {
     "files.exclude": {
         "**/.pio": true,
-    }
+        "build": true,
+    },
+    "makefile.configurations": [
+        {
+            "name": "Default",
+            "makeArgs": []
+        }
+    ],
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/Users/gabor/DevMac/SW/Sensor-Watch-ChirpyRX/src/arduino/build",
+            "binaryPath": "/Users/gabor/DevMac/SW/Sensor-Watch-ChirpyRX/src/arduino/build/test.out",
+            "binaryArgs": []
+        }
+    ],
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 2, ColumnLimit: 0, SortIncludes: false }"
 }
