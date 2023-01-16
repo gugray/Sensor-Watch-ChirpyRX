@@ -1,7 +1,10 @@
 import {FFTAnalyzer} from "./fftAnalyzer.js";
-import {ToneStencil, Decoder} from "./decoder.js"
+import {ToneStencil, Demodulator, Block, Decoder} from "./chirpy-rx.js";
+import {runChirpyRxTests} from "./chirpy-rx-tests.js";
+import {toBase64} from "./base64.js";
 
-const audioFile = "data-b7-21.wav";
+const audioFile = "data-be-03.wav";
+const stopAtEnd = true;
 const gainVal = 10;
 const toneRate = 64/3;
 const baseFreq = 2500;
@@ -27,10 +30,12 @@ let audioCtx, gain, buffer, source, scriptNode, encoder;
 let isPlaying = false;
 let fftAnalyzer;
 let spectra;
-let dec, startMsec, tones;
+let dem, startMsec, tones;
 
 
 document.addEventListener('DOMContentLoaded', () => {
+
+  // runChirpyRxTests();
 
   elmBtnRecord = document.getElementById("btnRecord");
   elmBtnRecord.addEventListener("click", () => toggleRecord());
@@ -149,41 +154,59 @@ function retrieveFFTSamples() {
   const fftSamples = fftAnalyzer.getSamples();
   createSamplesDownload(fftSamples);
 
-  dec = new Decoder({
+  dem = new Demodulator({
     sampleRate: buffer.sampleRate,
     fftSize,
     toneRate,
     baseFreq,
     freqStep,
     nFreqs});
-  startMsec = dec.findStartMsec(spectra);
+  startMsec = dem.findStartMsec(spectra);
   const recLen = Math.round(buffer.length / buffer.sampleRate * 1000);
   elmDecoded.innerText = "Start detected at " + startMsec + " (total length: " + recLen + ")\n";
 
   tones = [];
   let endDetected = false;
   if (startMsec != -1) {
-    for (let i = 0; true; ++i) {
-      const msec = startMsec + dec.toneLenMsec * i;
+    for (let i = 0; !stopAtEnd || !endDetected; ++i) {
+      const msec = startMsec + dem.toneLenMsec * i;
       if (msec + 200 > recLen) break;
-      const tone = dec.detecToneAt(spectra, msec);
+      const tone = dem.detecToneAt(spectra, msec);
       tones.push(tone);
-      if (tone == dec.symFreqs.length - 1 && tones.length >= 2 && tones[tones.length-2] == 0) {
+      if (doesEndInEOM(tones, dem.symFreqs.length - 1))
         endDetected = true;
-      }
+      // if (tone == dec.symFreqs.length - 1 && tones.length >= 2 && tones[tones.length-2] == 0) {
+      //   endDetected = true;
+      // }
     }
     if (!endDetected) {
       elmDecoded.innerText += "No EOM found\n";
     }
     elmDecoded.innerText += "======================================================\n";
     for (let i = 0; i < tones.length; ++i) {
-      if ((i % 16) != 0) elmDecoded.innerText += " ";
-      else if (i > 0) elmDecoded.innerText += "\n";
+      if (i == 4) elmDecoded.innerText += ",\n";
+      else if (((i - 4) % 45) == 0) elmDecoded.innerText += ",\n";
+      else if (i > 0) elmDecoded.innerText += ", ";
+      // if ((i % 16) != 0) elmDecoded.innerText += " ";
+      // else if (i > 0) elmDecoded.innerText += "\n";
       elmDecoded.innerText += tones[i];
     }
   }
+  const dec = new Decoder(tones);
+  elmDecoded.innerText += "\n======================================================\n";
+  elmDecoded.innerText += toBase64(dec.bytes);
+  elmDecoded.innerText += "\n======================================================\n";
+  elmDecoded.innerText += dec.ascii;
 
   drawOutput();
+}
+
+function doesEndInEOM(tones, signaToneIx) {
+  if (tones.length < 3) return false;
+  for (let i = 0; i < 3; ++i) {
+    if (tones[tones.length - i - 1] != signaToneIx) return false;
+  }
+  return true;
 }
 
 function onPlay() {
@@ -250,7 +273,7 @@ function drawOutput() {
 function onStencilChanged() {
   if (!spectra) return;
   drawOutput();
-  if (elmStencil.checked) drawStencil(dec, tones, startMsec);
+  if (elmStencil.checked) drawStencil(dem, tones, startMsec);
 }
 
 function drawStencil(dec, tones, startMsec) {

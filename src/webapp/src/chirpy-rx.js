@@ -2,7 +2,6 @@ class ToneStencil {
   constructor(freq, sampleRate, fftSize) {
     this.freq = freq;
     this.bins = getBins(freq, sampleRate, fftSize, true);
-    // this.bins.push(...getBins(freq * 3, sampleRate, fftSize, true));
   }
 }
 
@@ -19,7 +18,7 @@ function getBins(freq, sampleRate, fftSize, multiple = false) {
   else return [midIx];
 }
 
-class Decoder {
+class Demodulator {
 
   constructor({sampleRate, fftSize, toneRate, baseFreq, freqStep, nFreqs}) {
 
@@ -122,4 +121,145 @@ function detectTone(spectrum, stencils) {
   else return -1;
 }
 
-export {ToneStencil, Decoder}
+class Block {
+  constructor(startTonePos, nTones, bytes, crc) {
+    this.startTonePos = startTonePos;
+    this.nTones = nTones;
+    this.bytes = bytes;
+    this.ascii = getAscii(bytes);
+    this.crc = crc;
+    this.valid = crc == getCRC8(bytes);
+  }
+}
+
+class Decoder {
+  constructor(tones) {
+    this.tones = tones;
+    this.blocks = decode(tones);
+    this.bytes = catBytes(this.blocks);
+    this.ascii = catAscii(this.blocks);
+    this.valid = true;
+    for (const block of this.blocks)
+      if (!block.valid)
+        this.valid = false;
+  }
+}
+
+function getAscii(bytes) {
+  let res = "";
+  for (const b of bytes) {
+    res += String.fromCodePoint(b);
+  }
+  return res;
+}
+
+function catBytes(blocks) {
+  const bytes = [];
+  for (const block of blocks) {
+    bytes.push(...block.bytes);
+  }
+  return bytes;
+}
+
+function catAscii(blocks) {
+  let str = "";
+  for (const block of blocks) {
+    str += block.ascii;
+  }
+  return str;
+}
+
+function decode(tones) {
+  const blocks = [];
+  // Single-byte transmission is 14 tones
+  if (tones.length < 14) return blocks;
+  // Start sequence
+  if (tones[0] != 8 || tones[1] != 0 || tones[2] != 8 || tones[3] != 0) return blocks;
+  // Go block by block
+  let ix = 4;
+  while (true) {
+    const endIx = getBlockEndIx(tones, ix);
+    if (endIx == -1) break;
+    blocks.push(decodeBlock(tones.slice(ix, endIx)));
+    ix = endIx;
+  }
+  return blocks;
+}
+
+const toneBits = [
+  [0, 0, 0],
+  [0, 0, 1],
+  [0, 1, 0],
+  [0, 1, 1],
+  [1, 0, 0],
+  [1, 0, 1],
+  [1, 1, 0],
+  [1, 1, 1],
+];
+
+function getToneBits(tone) {
+  // For wrong tones (interim 8s): don't crash
+  // We hope that CRC will catch this
+  return toneBits[tone % 8];
+}
+
+function decodeBlock(tones, start, end) {
+
+  const seq = tones.slice(start, end);
+
+  const bits = [];
+  for (let i = 0; i < seq.length - 5; ++i)
+    bits.push(...getToneBits(seq[i]));
+  const crcBits = [
+    ...getToneBits(seq[seq.length-4]),
+    ...getToneBits(seq[seq.length-3]),
+    ...getToneBits(seq[seq.length-2]),
+  ];
+  const bytes = getBytes(bits);
+  const crcBytes = getBytes(crcBits);
+  return new Block(start, end - start, bytes, crcBytes[0]);
+}
+
+function getBytes(bits) {
+  const res = [];
+  for (let i = 0; i + 8 <= bits.length; i += 8) {
+    let val = 0;
+    for (let j = 0; j < 8; ++j) {
+      val <<= 1;
+      val += bits[i + j];
+    }
+    res.push(val);
+  }
+  return res;
+}
+
+function getBlockEndIx(tones, startIx) {
+  // Find next 8NNN8
+  for (let i = startIx + 4; i < tones.length; ++i) {
+    if (tones[i] == 8 && tones[i -4] == 8) {
+      return i + 1;
+    }
+  }
+  return -1;
+}
+
+function getCRC8(bytes) {
+
+  let crc = 0;
+  for (const b of bytes)
+    crc = updateCRC(b, crc);
+  return crc;
+
+  function updateCRC(nextByte, crc) {
+    for (let j = 0; j < 8; j++) {
+      let mix = (crc ^ nextByte) & 0x01;
+      crc >>= 1;
+      if (mix)
+        crc ^= 0x8C;
+      nextByte >>= 1;
+    }
+    return crc;
+  }
+}
+
+export {ToneStencil, Demodulator, Block, Decoder}
