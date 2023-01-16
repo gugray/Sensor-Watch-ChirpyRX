@@ -3,6 +3,10 @@ node_modules
 .idea
 yarn-error.log
 
+*.wav
+*.bmp
+
 src/webapp/public/app.*
 src/webapp/public/index.html
 src/webapp/public/version.html
+
