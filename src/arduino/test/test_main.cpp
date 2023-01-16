@@ -44,6 +44,9 @@ void test_crc8() {
 
   crc = chirpy_update_crc8(0, 0);
   TEST_ASSERT_EQUAL(0, crc);
+
+  crc = chirpy_update_crc8(0x4f, 0);
+  TEST_ASSERT_EQUAL(7, crc);
 }
 
 const uint16_t data_len_01 = 0;
@@ -60,6 +63,18 @@ const uint16_t data_len_03 = 1;
 const uint8_t data_03[] = {0x68};
 const uint16_t tones_len_03 = 14;
 const uint8_t tones_03[] = {8, 0, 8, 0, 3, 2, 0, 8, 5, 1, 6, 8, 8, 8};
+
+const uint16_t data_len_04 = 3;
+const uint8_t data_04[] = {0x68, 0x65, 0x6e};
+const uint16_t tones_len_04 = 19;
+const uint8_t tones_04[] = {8, 0, 8, 0, 3, 2, 0, 6, 2, 5, 5, 6, 8, 2, 7, 6, 8, 8, 8};
+
+const uint16_t data_len_05 = 4;
+const uint8_t data_05[] = {0x68, 0x65, 0x6e, 0x4f};
+const uint16_t tones_len_05 = 27;
+const uint8_t tones_05[] = {
+    8, 0, 8, 0, 3, 2, 0, 6, 2, 5, 5, 6, 8, 2, 7, 6, 8,
+    2, 3, 6, 8, 0, 1, 6, 8, 8, 8};
 
 uint8_t curr_data_pos;
 uint8_t curr_data_len;
@@ -80,6 +95,7 @@ void test_encoder_one(const uint8_t *data, uint16_t data_len, const uint8_t *ton
   curr_data_pos = 0;
   chirpy_encoder_state_t ces;
   chirpy_init_encoder(&ces, get_next_byte);
+  ces.block_size = 3;
 
   uint8_t got_tones[2048] = {0};
   uint16_t got_tone_pos = 0;
@@ -91,6 +107,7 @@ void test_encoder_one(const uint8_t *data, uint16_t data_len, const uint8_t *ton
   }
   char buf1[65536];
   char bufx[256];
+  memset(buf1, 0, 65536);
   for (uint16_t i = 0; i < got_tone_pos; ++i) {
     if (i == 0)
       sprintf(bufx, "%d", got_tones[i]);
@@ -105,12 +122,16 @@ void test_encoder_one(const uint8_t *data, uint16_t data_len, const uint8_t *ton
 }
 
 void test_encoder() {
-  // TEST_MESSAGE("Testing encoder with dataset 01");
-  // test_encoder_one(data_01, data_len_01, tones_01, tones_len_01);
-  // TEST_MESSAGE("Testing encoder with dataset 02");
-  // test_encoder_one(data_02, data_len_02, tones_02, tones_len_02);
+  TEST_MESSAGE("Testing encoder with dataset 01");
+  test_encoder_one(data_01, data_len_01, tones_01, tones_len_01);
+  TEST_MESSAGE("Testing encoder with dataset 02");
+  test_encoder_one(data_02, data_len_02, tones_02, tones_len_02);
   TEST_MESSAGE("Testing encoder with dataset 03");
   test_encoder_one(data_03, data_len_03, tones_03, tones_len_03);
+  TEST_MESSAGE("Testing encoder with dataset 04");
+  test_encoder_one(data_04, data_len_04, tones_04, tones_len_04);
+  TEST_MESSAGE("Testing encoder with dataset 05");
+  test_encoder_one(data_05, data_len_05, tones_05, tones_len_05);
 }
 
 int main(void) {

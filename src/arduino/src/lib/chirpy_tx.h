@@ -18,6 +18,7 @@ typedef struct {
   uint8_t tone_pos;
   uint8_t tone_count;
   uint8_t block_len;
+  uint8_t block_size;
   uint8_t crc;
   uint16_t bits;
   uint8_t bit_count;

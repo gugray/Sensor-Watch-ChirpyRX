@@ -6,22 +6,14 @@
 // This many bytes are followed by a CRC and block separator
 // It's a multiple of 3 so no bits are wasted (a tone encodes 3 bits)
 // Last block can be shorter
-const uint8_t chirpy_block_size = 15;
+const uint8_t chirpy_default_block_size = 15;
 
 const uint8_t chirpy_control_tone = 8;
 
 uint8_t chirpy_crc8(const uint8_t *addr, uint16_t len) {
   uint8_t crc = 0;
-  for (uint16_t i = 0; i < len; i++) {
-    uint8_t inbyte = addr[i];
-    for (uint8_t j = 0; j < 8; j++) {
-      uint8_t mix = (crc ^ inbyte) & 0x01;
-      crc >>= 1;
-      if (mix)
-        crc ^= 0x8C;
-      inbyte >>= 1;
-    }
-  }
+  for (uint16_t i = 0; i < len; i++)
+    crc = chirpy_update_crc8(addr[i], crc);
   return crc;
 }
 
@@ -47,6 +39,7 @@ void _chirpy_append_tone(chirpy_encoder_state_t *ces, uint8_t tone) {
 
 void chirpy_init_encoder(chirpy_encoder_state_t *ces, chirpy_get_next_byte_t get_next_byte) {
   memset(ces, 0, sizeof(chirpy_encoder_state_t));
+  ces->block_size = chirpy_default_block_size;
   ces->get_next_byte = get_next_byte;
   _chirpy_append_tone(ces, 8);
   _chirpy_append_tone(ces, 0);
@@ -132,7 +125,7 @@ uint8_t chirpy_get_next_tone(chirpy_encoder_state_t *ces) {
   _chirpy_encode_bits(ces, 0);
   ++ces->block_len;
   ces->crc = chirpy_update_crc8(next_byte, ces->crc);
-  if (ces->block_len == chirpy_block_size)
+  if (ces->block_len == ces->block_size)
     _chirpy_finish_block(ces);
   
   return _chirpy_retrieve_next_tone(ces);

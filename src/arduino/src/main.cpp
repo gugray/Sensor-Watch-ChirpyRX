@@ -3,6 +3,7 @@
 #include "blinkTestWorker.h"
 #include "scaleWorker.h"
 #include "data8Worker.h"
+#include "dataEncodeWorker.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -17,10 +18,6 @@ extern "C"
 // CRC-8 to add:
 // https://stackoverflow.com/a/15171925
 // This >>>>  https://stackoverflow.com/a/51731327
-
-// Edit this to use different worker in sketch
-// Ie try a different buzzin experiment
-#define WORKER Data8Worker
 
 const uint16_t tonePeriods16[] = { 417, 385, 358, 334, 313, 295, 278, 264, 251, 239, 228, 218, 209, 201, 193, 186, 455, 179 };
 
@@ -79,7 +76,11 @@ ISR(TIMER2_OVF_vect)
   // But only if we have an actual worker RN
   if (worker == NULL) return;
   // Call tick. Remove worker when they say they're finished.
-  if (!worker->Tick()) worker = NULL;
+  if (!worker->Tick())
+  {
+    delete worker;
+    worker = NULL;
+  }
   else worker->Count();
 }
 
@@ -122,7 +123,10 @@ ISR(PCINT0_vect)
   if (worker != NULL) return;
 
   // Create new worker
-  worker = new WORKER();
+  const uint8_t *data = dataB;
+  uint16_t dataLen = strlen((const char*)data);
+  
+  worker = new DataEncodeWorker(data, dataLen);
 }
 
 void setupButton()
@@ -135,11 +139,13 @@ void setupButton()
 
 void setup()
 {
+  Serial.begin(9600);
+
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUZZER_PIN, OUTPUT);
   digitalWrite(BUZZER_PIN, LOW);
   pinMode(BTN_PIN, INPUT_PULLUP);
-
+  
   setupTimer1();
   setupTimer2();
   setupButton();
@@ -149,7 +155,6 @@ void loop()
 {
   // Dummy
   delay(100);
-  crc8("fds", 3);
 }
 
 void buzzerOff()
