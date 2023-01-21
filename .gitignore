@@ -6,7 +6,10 @@ yarn-error.log
 *.wav
 *.bmp
 
-src/webapp/public/app.*
-src/webapp/public/index.html
-src/webapp/public/version.html
+src/lab-webapp-rx/public/app.*
+src/lab-webapp-rx/public/index.html
+src/lab-webapp-rx/public/version.html
 
+src/chirpy-rx/public/app.*
+src/chirpy-rx/public/index.html
+src/chirpy-rx/public/version.html
