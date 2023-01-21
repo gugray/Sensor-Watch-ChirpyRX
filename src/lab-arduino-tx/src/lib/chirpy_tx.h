@@ -41,4 +41,30 @@ void chirpy_init_encoder(chirpy_encoder_state_t *ces, chirpy_get_next_byte_t get
   */ 
 uint8_t chirpy_get_next_tone(chirpy_encoder_state_t *ces);
 
+/** @brief Returns the period value for buzzing out a tone.
+  * @param tone The tone index, 0 thru 8.
+  * @return The period for the tone's frequency, i.e., 1_000_000 / freq.
+  */
+uint16_t chirpy_get_tone_period(uint8_t tone);
+
+/** @brief Typedef for a tick handler function.
+  */ 
+typedef void (*chirpy_tick_fun_t)(void *context);
+
+/** @brief Creature-comfort struct for use in your chirping code.
+  * @details The idea is to handle a tick that happens 64 times per second at the outermost level.
+  *          To get to the desired ~20 tones per second, increment a counter and call the actual
+  *          transmission ticker when tick_counter reaches tick_compare, with a compare value of 3.
+  *          seq_pos is for use by the transmission function to keep track of where it is in the data.
+  *          The current transmission function is stored in tick_fun. You can have multiple phases
+  *          by switching to a different function. E.g., intro countdown first, followed by data chirping.
+  */ 
+typedef struct {
+    uint8_t tick_count;
+    uint8_t tick_compare;
+    uint16_t seq_pos;
+    chirpy_tick_fun_t tick_fun;
+} chirpy_tick_state_t;
+
+
 #endif

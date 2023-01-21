@@ -3,7 +3,7 @@ import {ToneStencil, Demodulator, Block, Decoder} from "./chirpy-rx.js";
 import {runChirpyRxTests} from "./chirpy-rx-tests.js";
 import {toBase64} from "./base64.js";
 
-const audioFile = "data-be-03.wav";
+const audioFile = "data-w7-04.wav";
 const stopAtEnd = true;
 const gainVal = 10;
 const toneRate = 64/3;

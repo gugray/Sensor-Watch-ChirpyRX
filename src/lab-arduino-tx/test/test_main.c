@@ -1,15 +1,9 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 #include "../src/lib/chirpy_tx.h"
 #include "unity.h"
-#ifdef __cplusplus
-}
-#endif
 
-#include <string.h>
 
 void setUp(void) {
 }
