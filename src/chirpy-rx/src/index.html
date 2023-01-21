@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="google" content="notranslate">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Sensor Watch Modem</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <link rel="stylesheet" href="./app.css" id="app-css">
+  <script src="dsp.js"></script>
+  <script src="WavAudioEncoder.js"></script>
+  <script defer src="./app.js" id="app-js"></script>
+  <!--LiveReload-->
+  <script>
+    document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +
+      ':35729/livereload.js?snipver=1"></' + 'script>')
+  </script>
+  <!--LiveReload-->
+</head>
+<body>
+  <main>
+    <h1>Chirpy RX</h1>
+    <p>
+      Here is how to use Chirpy RX, and what it's all about.
+    </p>
+    <section id="ctrlAudio">
+      <h2>Record audio</h2>
+      <button id="btnAudio" class="enable">
+        <svg viewBox="0 -256 1792 1792" id="imgEnable">
+          <g transform="matrix(1,0,0,-1,113.89831,1346.1695)">
+            <path d="M 1536,640 Q 1536,484 1475,342 1414,200 1311,97 1208,-6 1066,-67 924,-128 768,-128 612,-128 470,-67 328,-6 225,97 122,200 61,342 0,484 0,640 0,822 80.5,983 161,1144 307,1253 q 43,32 95.5,25 52.5,-7 83.5,-50 32,-42 24.5,-94.5 Q 503,1081 461,1049 363,975 309.5,868 256,761 256,640 256,536 296.5,441.5 337,347 406,278 475,209 569.5,168.5 664,128 768,128 872,128 966.5,168.5 1061,209 1130,278 q 69,69 109.5,163.5 40.5,94.5 40.5,198.5 0,121 -53.5,228 -53.5,107 -151.5,181 -42,32 -49.5,84.5 -7.5,52.5 24.5,94.5 31,43 84,50 53,7 95,-25 146,-109 226.5,-270 Q 1536,822 1536,640 z M 896,1408 V 768 q 0,-52 -38,-90 -38,-38 -90,-38 -52,0 -90,38 -38,38 -38,90 v 640 q 0,52 38,90 38,38 90,38 52,0 90,-38 38,-38 38,-90 z" />
+          </g>
+        </svg>
+        <svg viewBox="0 0 1000 1000" id="imgRecord">
+          <path d="M500,10C229.4,10,10,229.4,10,500s219.4,490,490,490s490-219.4,490-490S770.6,10,500,10z"/>
+        </svg>
+        <svg viewBox="0 0 1000 1000" id="imgStop">
+          <path d="M500,10C229.3,10,10,229.4,10,500C10,770.7,229.3,990,500,990c270.7,0,490-219.4,490-490.1C990,229.4,770.7,10,500,10z M732.4,705.3c0,5.2-4.3,9.7-9.7,9.7H314.4c-5.3,0-9.6-4.4-9.6-9.7V294.6c0-5.3,4.3-9.6,9.6-9.6h408.3c5.3,0,9.7,4.2,9.7,9.6V705.3z"/>
+        </svg>
+      </button>
+      <div id="ctrlAudioText">
+        <div id="ctrlAudioTop">Press to enable microphone</div>
+        <div id="ctrlAudioBottom">
+          <span id="lblLength"></span>
+          <a href="#" id="lnkWav">download .wav file</a>
+        </div>
+      </div>
+    </section>
+    <section id="ctrlDecoding" class="tones visible">
+      <h2>Decoding</h2>
+      <p id="decodingWIP">Working on it</p>
+      <div id="decodingRes">
+        <nav>
+          <a id="lnkTones">Tones</a><a id="lnkBlocks">Blocks</a><a id="lnkBase64">Base64</a><a id="lnkContent" class="hidden">Content</a>
+        </nav>
+        <article id="resTones">
+        </article>
+        <article id="resBlocks">
+        </article>
+        <article id="resBase64">
+        </article>
+        <article id="resContent">
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
