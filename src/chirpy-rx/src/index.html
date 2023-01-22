@@ -10,8 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <link rel="stylesheet" href="./app.css" id="app-css">
-  <script src="dsp.js"></script>
-  <script src="WavAudioEncoder.js"></script>
   <script defer src="./app.js" id="app-js"></script>
   <!--LiveReload-->
   <script>
@@ -27,7 +25,7 @@
       Here is how to use Chirpy RX, and what it's all about.
     </p>
     <section id="ctrlAudio">
-      <h2>Record audio</h2>
+      <h2>Audio transmission</h2>
       <button id="btnAudio" class="enable">
         <svg viewBox="0 -256 1792 1792" id="imgEnable">
           <g transform="matrix(1,0,0,-1,113.89831,1346.1695)">
@@ -40,18 +38,22 @@
         <svg viewBox="0 0 1000 1000" id="imgStop">
           <path d="M500,10C229.3,10,10,229.4,10,500C10,770.7,229.3,990,500,990c270.7,0,490-219.4,490-490.1C990,229.4,770.7,10,500,10z M732.4,705.3c0,5.2-4.3,9.7-9.7,9.7H314.4c-5.3,0-9.6-4.4-9.6-9.7V294.6c0-5.3,4.3-9.6,9.6-9.6h408.3c5.3,0,9.7,4.2,9.7,9.6V705.3z"/>
         </svg>
+        <svg viewBox="0 0 24 24" id="imgDone">
+          <path d="M21.652,3.211c-0.293-0.295-0.77-0.295-1.061,0L9.41,14.34  c-0.293,0.297-0.771,0.297-1.062,0L3.449,9.351C3.304,9.203,3.114,9.13,2.923,9.129C2.73,9.128,2.534,9.201,2.387,9.351  l-2.165,1.946C0.078,11.445,0,11.63,0,11.823c0,0.194,0.078,0.397,0.223,0.544l4.94,5.184c0.292,0.296,0.771,0.776,1.062,1.07  l2.124,2.141c0.292,0.293,0.769,0.293,1.062,0l14.366-14.34c0.293-0.294,0.293-0.777,0-1.071L21.652,3.211z"/>
+        </svg>
       </button>
       <div id="ctrlAudioText">
         <div id="ctrlAudioTop">Press to enable microphone</div>
         <div id="ctrlAudioBottom">
           <span id="lblLength"></span>
-          <a href="#" id="lnkWav">download .wav file</a>
+          <a href="#" id="lnkWav">save</a>
         </div>
       </div>
+      <a href="#" id="lnkTest">test</a>
     </section>
-    <section id="ctrlDecoding" class="tones visible">
+    <section id="ctrlDecoding" class="tones">
       <h2>Decoding</h2>
-      <p id="decodingWIP">Working on it</p>
+      <p id="decodingStatus">Processing audio...</p>
       <div id="decodingRes">
         <nav>
           <a id="lnkTones">Tones</a><a id="lnkBlocks">Blocks</a><a id="lnkBase64">Base64</a><a id="lnkContent" class="hidden">Content</a>

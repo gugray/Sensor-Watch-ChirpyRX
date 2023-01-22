@@ -180,7 +180,10 @@ function decode(tones) {
   while (true) {
     const endIx = getBlockEndIx(tones, ix);
     if (endIx == -1) break;
-    blocks.push(decodeBlock(tones.slice(ix, endIx)));
+    const block = decodeBlock(tones.slice(ix, endIx));
+    block.startTonePos = ix;
+    block.nTones = endIx - ix;
+    blocks.push(block);
     ix = endIx;
   }
   return blocks;

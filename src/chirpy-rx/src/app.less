@@ -6,6 +6,8 @@
 @bgColor: white;
 @redColor: hsl(5, 50%, 55%);
 @redHoverColor: hsl(5, 50%, 85%);
+@blueColor: hsl(217, 32%, 55%);
+@greenColor: hsl(145, 30%, 42%);
 @greyBgColor: hsl(39, 35%, 97%);
 
 *, *:before, *:after { box-sizing: border-box; }
@@ -21,6 +23,7 @@ main {
 }
 
 h1 { font-size: @fntLargeSize; font-weight: bold; text-transform: uppercase; }
+a { color: @blueColor; }
 
 button {
   box-shadow: none; -webkit-box-shadow: none; -webkit-appearance: none;
@@ -37,6 +40,8 @@ section {
   #ctrlAudioText { height: 64px; margin-left: 12px; display: inline-block; }
   a { text-decoration: none; }
   a#lnkWav { display: none; }
+  a#lnkTest { position: relative; float: right; display: none; }
+  a#lnkTest.visible { display: block; }
 }
 
 #btnAudio {
@@ -51,6 +56,11 @@ section {
   &.enable svg#imgEnable { display: inline-block; }
   &.record svg#imgRecord { display: inline-block; }
   &.stop svg#imgStop { display: inline-block; }
+  &.done svg#imgDone { display: inline-block; }
+  &.done {
+    border-color: @blueColor; background-color: @blueColor;
+    svg path { fill: white; }
+  }
 }
 
 #ctrlDecoding {
@@ -58,13 +68,13 @@ section {
   &.visible { display: block; }
   #ctrlDecodingRes { display: none; }
   #ctrlDecodingRes.visible { display: block; }
-  #decodingWIP { display: none; }
-  #decodingWIP.visible { display: block; }
   nav a {
-    display: inline-block; padding: 4px 12px; cursor: default;
+    display: none; padding: 4px 12px; cursor: default; color: inherit;
     &:hover { background-color: hsl(39, 35%, 93%); }
     &.hidden { display: none; }
   }
+  nav a#lnkTones { display: inline-block; }
+  nav a.visible { display: inline-block; }
   &.tones nav a#lnkTones { background-color: hsl(39, 35%, 88%); }
   &.blocks nav a#lnkBlocks { background-color: hsl(39, 35%, 88%); }
   &.base64 nav a#lnkBase64 { background-color: hsl(39, 35%, 88%); }
@@ -76,6 +86,9 @@ section {
   article {
     border: 2px solid hsl(39, 35%, 88%); background-color: white; padding: 12px;
     display: none; font-size: 16px;
+    overflow-x: auto;
   }
   pre { font-family: monospace; white-space: pre-wrap; font-size: 14px; margin: 0; }
+  span.valid { color: @greenColor; }
+  span.invalid { color: @redColor; }
 }
