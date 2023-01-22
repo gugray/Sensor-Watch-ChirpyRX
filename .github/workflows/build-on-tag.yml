@@ -1,0 +1,51 @@
+name: Build and publish
+
+on:
+  push:
+    # branches: [ main ]
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16
+
+    - name: Install Node dependencies
+      run: yarn install --frozen-lockfile
+
+    - name: Build web app
+      run: node build.js --prod
+
+    - name: Write version from REF to file
+      working-directory: ./public
+      run: 'echo "${GITHUB_REF/refs\/tags\//}" >version.html'
+
+    - name: ZIP output folder
+      working-directory: ./public
+      run: zip -r ../chirpy-rx-public.zip .
+
+    - name: SCP file
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.SCP_HOST }}
+        username: ${{ secrets.SCP_USER }}
+        key: ${{ secrets.SCP_KEY }}
+        source: "chiry-rx-public.zip"
+        target: "."
+
+    - name: Invoke deployment hook
+      uses: distributhor/workflow-webhook@v1
+      env:
+        webhook_url: ${{ secrets.WEBHOOK_URL }}
+        webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+        data: '{ "secret": "${{ secrets.WEBHOOK_SECRET }}"  }'
+       
