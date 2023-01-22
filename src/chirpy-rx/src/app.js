@@ -4,8 +4,10 @@ import {FFT} from "./fft.js";
 import {runChirpyRxTests} from "./chirpy-rx-tests.js";
 import {toBase64} from "./base64.js";
 
-const showTest = true;
-const testFileName = "data-02.wav";
+// TODO: Fix day decode error for Activity
+
+const showTest = false;
+const testFileName = "data-03.wav";
 
 const gainVal = 10;
 const toneRate = 64/3;
@@ -307,7 +309,7 @@ function startDecoding(startMsec, endMsec) {
 
 function interpretContent() {
   // Does prefix indicate a known format?
-  if (decoder.bytes.length > 2 && decoder.bytes[0] == 0x05 && decoder.bytes[1] == 0x27) {
+  if (decoder.bytes.length > 2 && decoder.bytes[0] == 0x27 && decoder.bytes[1] == 0x00) {
     interpretAsActivity();
   }
   // Can it still be ASCII?
@@ -338,6 +340,7 @@ class DecodedActivity {
     // uint16_t total_sec;
     // uint16_t pause_sec;
     // uint8_t activity_type;
+
     let year = (bytes[0] & 0b11111100) >> 2;
     year += 2020;
     let month = ((bytes[0] & 0b00000011) << 2) + ((bytes[1] & 0b11000000) >> 6);
