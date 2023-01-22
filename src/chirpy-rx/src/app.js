@@ -5,7 +5,7 @@ import {runChirpyRxTests} from "./chirpy-rx-tests.js";
 import {toBase64} from "./base64.js";
 
 const showTest = true;
-const testFileName = "test-data.wav";
+const testFileName = "data-02.wav";
 
 const gainVal = 10;
 const toneRate = 64/3;
@@ -307,7 +307,7 @@ function startDecoding(startMsec, endMsec) {
 
 function interpretContent() {
   // Does prefix indicate a known format?
-  if (decoder.bytes.length > 2 && decoder.bytes[0] == 0x27 && decoder.bytes[0] == 0x00) {
+  if (decoder.bytes.length > 2 && decoder.bytes[0] == 0x05 && decoder.bytes[1] == 0x27) {
     interpretAsActivity();
   }
   // Can it still be ASCII?
@@ -338,17 +338,14 @@ class DecodedActivity {
     // uint16_t total_sec;
     // uint16_t pause_sec;
     // uint8_t activity_type;
-    let second = (bytes[0] & 0b11111100) >> 2;
-    let minute = (bytes[0] & 0b00000011) << 4;
-    minute += (bytes[1] & 0b11110000) >> 4;
-    let hour = (bytes[1] & 0b00001111) << 1;
-    hour += (bytes[2] & 0b10000000) >> 7;
-    let day = (bytes[2] & 0b01111100) >> 2;
-    let month = (bytes[2] & 0b00000011) << 2;
-    month += (bytes[3] & 0b11000000) >> 6;
-    let year = bytes[3] & 0b00111111;
+    let year = (bytes[0] & 0b11111100) >> 2;
     year += 2020;
-    this.start = new Date(year, month - 1, day - 1, hour, minute, second);
+    let month = ((bytes[0] & 0b00000011) << 2) + ((bytes[1] & 0b11000000) >> 6);
+    let day = (bytes[1] & 0b00111110) >> 1;
+    let hour = ((bytes[1] & 0b00000001) << 4) + ((bytes[2] & 0b11110000) >> 4);
+    let minute = ((bytes[2] & 0b00001111) << 2) + ((bytes[3] & 0b11000000) >> 6);
+    let second = (bytes[3] & 0b00111111);
+    this.start = new Date(year, month - 1, day, hour, minute, second);
     this.totalSec = bytes[4] * 256 + bytes[5];
     this.pauseSec = bytes[6] * 256 + bytes[7];
     this.typeNum = bytes[8];
@@ -372,15 +369,15 @@ function dateToIso(date) {
 }
 
 function secsToDuration(val) {
-  let sec = val % 60;
-  val -= sec * 60;
+  let secs = val % 60;
+  val -= secs;
   val /= 60;
-  let min = val % 60;
-  val -= sec * 60;
-  let hour = val / 60;
-  let res = min.toString().padStart(2, "0") + ":" + sec.toString().padStart(2, "0");
-  if (hour == 0) return res;
-  res = hour.toString() + ":" + res;
+  let mins = val % 60;
+  val -= mins;
+  let hours = val / 60;
+  let res = mins.toString().padStart(2, "0") + ":" + secs.toString().padStart(2, "0");
+  if (hours == 0) return res;
+  res = hours.toString() + ":" + res;
   return res;
 }
 
@@ -391,7 +388,7 @@ function interpretAsActivity() {
     const itmBytes = decoder.bytes.slice(ix, ix + itmLen);
     items.push(new DecodedActivity(itmBytes));
   }
-  let tableTxt = "time\tactivity_code\tactivity_name\Ttotal_duration\tpause_duration\n";
+  let tableTxt = "time\tactivity_code\tactivity_name\ttotal_duration\tpause_duration\n";
   for (const itm of items) {
     tableTxt += dateToIso(itm.start) + "\t" + itm.typeNum + "\t" + itm.type + "\t";
     tableTxt += secsToDuration(itm.totalSec) + "\t" + secsToDuration(itm.pauseSec);
