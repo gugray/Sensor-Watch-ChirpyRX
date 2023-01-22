@@ -20,17 +20,19 @@ jobs:
         node-version: 16
 
     - name: Install Node dependencies
+      working-directory: src/chirpy-rx
       run: yarn install --frozen-lockfile
 
     - name: Build web app
+      working-directory: src/chirpy-rx
       run: node build.js --prod
 
     - name: Write version from REF to file
-      working-directory: ./public
+      working-directory: src/chirpy-rx/public
       run: 'echo "${GITHUB_REF/refs\/tags\//}" >version.html'
 
     - name: ZIP output folder
-      working-directory: ./public
+      working-directory: src/chirpy-rx/public
       run: zip -r ../chirpy-rx-public.zip .
 
     - name: SCP file
@@ -39,7 +41,7 @@ jobs:
         host: ${{ secrets.SCP_HOST }}
         username: ${{ secrets.SCP_USER }}
         key: ${{ secrets.SCP_KEY }}
-        source: "chiry-rx-public.zip"
+        source: "src/chirpy-rx/chirpy-rx-public.zip"
         target: "."
 
     - name: Invoke deployment hook
