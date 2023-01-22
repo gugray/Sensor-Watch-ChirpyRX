@@ -33,15 +33,15 @@ jobs:
 
     - name: ZIP output folder
       working-directory: src/chirpy-rx/public
-      run: zip -r ../chirpy-rx-public.zip .
-
+      run: zip -r ../../../chirpy-rx-public.zip .
+      
     - name: SCP file
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.SCP_HOST }}
         username: ${{ secrets.SCP_USER }}
         key: ${{ secrets.SCP_KEY }}
-        source: "src/chirpy-rx/chirpy-rx-public.zip"
+        source: "chirpy-rx-public.zip"
         target: "."
 
     - name: Invoke deployment hook
