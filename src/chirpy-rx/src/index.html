@@ -19,6 +19,7 @@
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <link rel="stylesheet" href="./app.css" id="app-css">
   <script defer src="./app.js" id="app-js"></script>
+  <script defer data-domain="jealousmarkup.xyz" src="https://plausible.io/js/script.js"></script>
   <!--LiveReload-->
   <script>
     document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +
@@ -29,9 +30,37 @@
 <body>
   <main>
     <h1>Chirpy RX</h1>
-    <p>
-      Here is how to use Chirpy RX, and what it's all about.
-    </p>
+    <div id="intro">
+      <div id="imageWrapper">
+        <div>
+          <p>
+            This simple Javascript application lets you record and decode data chirped out from the
+            <a href="https://www.sensorwatch.net/" target="_blank" rel="noreferrer">Sensor Watch</a>.
+            It's best to place a headset microphone right next to the watch, as shown in the image.
+            Watch faces like the <code>activity_face</code> or <code>chirpy_demo_face</code> can chirp out data.
+          </p>
+          <p>
+            You can process a single transmission at a time. Just reload the page to process a new one.
+            If you have trouble decoding a transmission, save the recorded audio and drop me an email at
+            <code>gabor.reads.this[at]gmail.com</code>, or hit me up on Mastodon at
+            <a href="https://genart.social/@twilliability" target="_blank" rel="noreferrer">twilliability@genart.social</a>.
+          </p>
+        </div>
+        <img src="watch-microphone.jpeg" alt="A CASIO wristwach with a headset microphone placed over it"/>
+      </div>
+      <p>
+        This app runs entirely in your browser. It does not upload your audio or the decoded data anywhere.
+        I use Plausible.io, a
+        <a href="https://plausible.io/privacy-focused-web-analytics" target="_blank" rel="noreferrer">privacy-focused</a>
+        analytics tool to count visits.
+      </p>
+      <p>The source code is
+        <a href="https://github.com/gugray/Sensor-Watch-ChirpyRX" target="_blank" rel="noreferrer">on Github</a>.
+      </p>
+      <p>
+
+      </p>
+    </div>
     <section id="ctrlAudio">
       <h2>Audio transmission</h2>
       <button id="btnAudio" class="enable">

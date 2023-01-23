@@ -5,9 +5,7 @@ import {runChirpyRxTests} from "./chirpy-rx-tests.js";
 import {toBase64} from "./base64.js";
 import {interpretContent} from "./content.js";
 
-// TODO: Fix day decode error for Activity
-
-const showTest = true;
+const showTest = false;
 const testFileName = "data-01.wav";
 
 const gainVal = 10;
@@ -293,7 +291,6 @@ function decodeTones(startMsec, endMsec) {
     elms.decodingStatus.innerText = "Message cannot be reconstructed: invalid CRC in one or more blocks.";
     return;
   }
-
   // Display decoded binary as Base64
   const base64 = toBase64(decoder.bytes);
   elms.resBase64.innerHTML = `

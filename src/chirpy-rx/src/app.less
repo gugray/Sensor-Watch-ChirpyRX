@@ -23,11 +23,11 @@ main {
 }
 
 h1 { font-size: @fntLargeSize; font-weight: bold; text-transform: uppercase; }
-a { color: @blueColor; }
+a { color: @blueColor; text-decoration: none; }
 
 button {
   box-shadow: none; -webkit-box-shadow: none; -webkit-appearance: none;
-  -webkit-border-radius: 0px; border-radius: 0; border: none; background-color: transparent;
+  -webkit-border-radius: 0; border-radius: 0; border: none; background-color: transparent;
   font-family: inherit; font-size: inherit; color: inherit; outline: none;
 }
 
@@ -36,9 +36,16 @@ section {
   h2 { margin: -4px 0 8px 0; font-size: @fntLargerSize; font-weight: bold; }
 }
 
+#intro {
+  #imageWrapper { display: flex; align-items: flex-start; }
+  margin-bottom: 20px;
+  p { margin: 0 20px 12px 0; flex-grow: 1; }
+  code { font-size: 15px; }
+  img { width: 200px; flex-shrink: 0; margin-bottom: 8px; }
+}
+
 #ctrlAudio {
   #ctrlAudioText { height: 64px; margin-left: 12px; display: inline-block; }
-  a { text-decoration: none; }
   a#lnkWav { display: none; }
   a#lnkTest { position: relative; float: right; display: none; }
   a#lnkTest.visible { display: block; }
