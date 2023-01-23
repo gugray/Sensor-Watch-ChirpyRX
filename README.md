@@ -6,7 +6,9 @@ beeped out by faces like the `activity_face` or `chirpy_demo_face` on Joey Casti
 
 You can use the live app here: https://jealousmarkup.xyz/off/chirpy/rx
 
-![Chirpy transmission from the watch](doc/chirpy-transmission.mp4)
+This is what a Chirpy data transmission looks and sounds like:
+
+https://user-images.githubusercontent.com/22029901/214139415-388a9de6-160e-4004-a579-6b523cd4701a.mp4
 
 ## Building and running
 
@@ -41,6 +43,11 @@ a watch's back side attached. I used it to quickly generate transmissions with
 various settings without the need to take a watch apart every time. The program is built
 with Platform.io.
 
-`lab-webapp-rx` is the app I used to analyze audio from recorded transmissions. It
-is a precursor to the final web app. It generate cool spectrograms like this:
+In practice the setup looks like this:
 
+![Arduino Nano with the piezo buzzer from a Casio watch](https://user-images.githubusercontent.com/22029901/214140329-b893ca5e-d72c-460c-9a03-eeb7304ecac4.jpg)
+
+`lab-webapp-rx` is the app I used to analyze audio from recorded transmissions. It
+is a precursor to the final web app. It generates cool spectrograms like this:
+
+![chirpy-spectrogram](https://user-images.githubusercontent.com/22029901/214140657-b1e70b20-48a3-4060-9e47-8b6bf2ef0261.jpg)
