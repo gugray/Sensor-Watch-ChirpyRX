@@ -36,6 +36,13 @@ class DecodedActivity {
     // uint16_t pause_sec;
     // uint8_t activity_type;
 
+    // bytes = [0x0f, 0x31, 0x05, 0xf2, 0x00, 0x4a, 0x00, 0x00, 0x00];
+    // 000011110011000100000101111100100000000001001010000000000000000000000000
+    // 000011 1100 11000 10000 010111 110010
+    // YYYYYY MMMM DDDDD HHHHH MMMMMM SSSSSS
+    // 765432 1076 54321 07654 321076 543210
+    //      3   12    24    16     23     50
+
     let year = (bytes[0] & 0b11111100) >> 2;
     year += 2020;
     let month = ((bytes[0] & 0b00000011) << 2) + ((bytes[1] & 0b11000000) >> 6);
@@ -59,7 +66,7 @@ class DecodedActivity {
 function dateToIso(date) {
   // 2012-01-01T00:00:00
   let res = date.getFullYear() + "-" + (date.getMonth() + 1).toString().padStart(2, "0") + "-";
-  res += (date.getDay() + 1).toString().padStart(2, "0") + "T";
+  res += date.getDate().toString().padStart(2, "0") + "T";
   res += date.getHours().toString().padStart(2, "0") + ":";
   res += date.getMinutes().toString().padStart(2, "0") + ":";
   res += date.getSeconds().toString().padStart(2, "0");
