@@ -1,8 +1,10 @@
-import {interpretAscii} from "./content-ascii.js";
 import {interpretActivity} from "./content-activity.js";
+import {interpretNanosecIni} from "./content-nanosec.js";
+import {interpretAscii} from "./content-ascii.js";
 
 const parserFuns = [
   interpretActivity,
+  interpretNanosecIni,
   interpretAscii,
 ];
 
