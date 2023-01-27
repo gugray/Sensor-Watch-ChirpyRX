@@ -5,7 +5,7 @@ import {runChirpyRxTests} from "./chirpy-rx-tests.js";
 import {toBase64} from "./base64.js";
 import {interpretContent} from "./content.js";
 
-const showTest = false;
+const showTest = true;
 const testFileName = "data-06.wav";
 
 const gainVal = 10;
@@ -111,6 +111,9 @@ function onBtnAudioClick() {
     source.connect(gain);
     scriptNode = audioCtx.createScriptProcessor(4096, 1, 1);
     source.connect(scriptNode);
+    // Next line is needed for this to work in Chrome
+    // https://github.com/WebAudio/web-audio-api/issues/345
+    scriptNode.connect(audioCtx.destination);
     wavEncoder = new WAVEncoder(audioCtx.sampleRate, 1);
     chunks = [];
     nSamples = 0;
