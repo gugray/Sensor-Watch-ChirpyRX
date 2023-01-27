@@ -5,7 +5,7 @@ import {runChirpyRxTests} from "./chirpy-rx-tests.js";
 import {toBase64} from "./base64.js";
 import {interpretContent} from "./content.js";
 
-const showTest = true;
+const showTest = false;
 const testFileName = "data-06.wav";
 
 const gainVal = 10;
